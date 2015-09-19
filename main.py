@@ -27,8 +27,8 @@ def main():
     seq = []
     scores = [0, 0, 0]
 
-    filename = raw_input('File with sequences: ')   # Input path to file, containing 2 sequences
-    if filename == '':
+    filename = raw_input('File with sequences: ')   # Input path to file, containing 2 sequences.
+    if filename == '':                              # If no input, open default.
         filename = r"file.txt"
     f = open(filename)
     line = f.readline()
@@ -45,21 +45,21 @@ def main():
     f.close()
     print('Found sequences:\n{}\n{}\n'.format(seq[0], seq[1]))
 
-    scores[0] = -1   # mismatch
-    scores[1] = 1    # match
-    scores[2] = -1   # gap
+    scores[0] = -1   # default mismatch
+    scores[1] = 1    # default match
+    scores[2] = -1   # default gap
     print('Default scores:\nMismatch {}\nMatch {}\nGap {}\n'.format(scores[0], scores[1], scores[2]))
     flag = raw_input('Do you want to change it? (y/n) ')
     if flag == 'y':
         scores[0] = int(raw_input('Mismatch score: '))   #
-        scores[1] = int(raw_input('Match score: '))      # Scores input
+        scores[1] = int(raw_input('Match score: '))      # Scores input.
         scores[2] = int(raw_input('Indel/gap score: '))  #
     elif flag == 'n':
         print('Working with default')
 
-    f_matrix = NeedlemanWunsch.matrix_filling(seq, scores)
+    f_matrix = NeedlemanWunsch.matrix_filling(seq, scores)  # Filling F-matrix according to Needleman-Wunsch algorithm.
 
-    seq[0], seq[1] = NeedlemanWunsch.result_seq(f_matrix, seq, scores)
+    seq[0], seq[1] = NeedlemanWunsch.result_seq(f_matrix, seq, scores)  # Getting result sequences.
     print('\nResult sequences:\n{}\n{}'.format(seq[0], seq[1]))
     print('Score {}'.format(f_matrix.pop().pop()))
 
