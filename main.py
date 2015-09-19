@@ -27,12 +27,12 @@ def main():
     seq = []
     scores = [0, 0, 0]
 
-    filename = raw_input('File with sequences: ') # Input path to file, containing 2 sequences
+    filename = raw_input('File with sequences: ')   # Input path to file, containing 2 sequences
     if filename == '':
         filename = r"file.txt"
     f = open(filename)
     line = f.readline()
-    while line != '':
+    while line != '':   # Scanning file for sequences
         if line.startswith('>'):
             line = f.readline()
             tmp = ''
@@ -58,7 +58,6 @@ def main():
         print('Working with default')
 
     f_matrix = NeedlemanWunsch.matrix_filling(seq, scores)
-    # print_matrix(f_matrix, seq)
 
     seq[0], seq[1] = NeedlemanWunsch.result_seq(f_matrix, seq, scores)
     print('\nResult sequences:\n{}\n{}'.format(seq[0], seq[1]))
