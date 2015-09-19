@@ -29,7 +29,7 @@ def main():
 
     filename = raw_input('File with sequences: ') # Input path to file, containing 2 sequences
     if filename == '':
-        filename = r"C:\Users\Lenovo\PycharmProjects\NeedlemanWunsch\file.txt"
+        filename = r"file.txt"
     f = open(filename)
     line = f.readline()
     while line != '':
