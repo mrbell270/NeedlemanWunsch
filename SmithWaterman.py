@@ -37,7 +37,11 @@ def gap_line(gap, length):
 def horizontal_max(f_matrix, i, j, gap):
     scores = []
     for k in range(1, j):
+<<<<<<< HEAD
         scores.append(f_matrix[i][j-k].score + gap_line(gap, k))
+=======
+        scores.append(f_matrix[i][j-k] + k * gap)
+>>>>>>> github/master
     if not len(scores):
         return 0
     return max(scores)
