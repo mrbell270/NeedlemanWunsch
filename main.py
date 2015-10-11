@@ -1,28 +1,8 @@
 __author__ = 'Lenovo'
+
 import NeedlemanWunsch
 import SmithWaterman
 import re
-
-
-def print_matrix(m, seq):
-    """
-    Printing sequences and matrix
-    :param m: [][]int
-    :param seq: [2]string
-    :return:
-    """
-    print('{:10}'.format("")),
-    for char in seq[1]:
-        print('{:4}'.format(char)),
-    print
-    for i in range(len(m)):
-        if not i:
-            print('{:2}'.format("")),
-        else:
-            print('{:2}'.format(seq[0][i-1])),
-        for j in range(len(m[i])):
-            print('{:4}'.format(m[i][j])),
-        print
 
 
 def ask(question):
@@ -34,15 +14,15 @@ def ask(question):
     else:
         ask(question)
 
+
 def main():
-    # TODO Add non-linear indel.
     seq = []
-    filename = raw_input('File with sequences: ')   # Input path to file, containing 2 sequences.
-    if filename == '':                              # If no input, open default.
+    filename = raw_input('File with sequences: ')  # Input path to file, containing 2 sequences.
+    if filename == '':  # If no input, open default.
         filename = r"file.txt"
     f = open(filename)
     line = f.readline()
-    while line != '':   # Scanning file for sequences
+    while line != '':  # Scanning file for sequences
         if line.startswith('>'):
             line = f.readline()
             tmp = ''
@@ -60,11 +40,15 @@ def main():
     else:
         seq_type = 'Protein'
     if seq_type == 'DNA':
-        mismatch = -1   # default mismatch
-        match = 1    # default match
-        gap = -1   # default gap
+        # match = 1  # default match
+        # mismatch = -1  # default mismatch
+        # gap = [-1, 0]  # default gap
+        match = 10  # default match
+        mismatch = -8  # default mismatch
+        gap = [-10, -1]  # default gap
 
-        print('Default scores:\nMismatch {}\nMatch {}\nGap {}\n'.format(mismatch, match, gap))
+        print('Default scores:\nMatch {}\nMismatch {}\nGap start {}\nGap extension {}\n'.format(match, mismatch, gap[0],
+                                                                                               gap[1]))
         flag = ask('Do you want to change it?')
         if flag:
             flag = ask('Do you want to rewrite whole matrix?')
@@ -79,9 +63,10 @@ def main():
                         s_matrix[letter_arr[y]][letter_arr[x]] = tmp
             else:
                 print('Rewriting only sores\n')
-                mismatch = int(raw_input('Mismatch score: '))  #
-                match = int(raw_input('Match score: '))        # Scores input.
-                gap = int(raw_input('Indel/gap score: '))      #
+                match = int(raw_input('Match score: '))  # Scores input.
+                mismatch = int(raw_input('Mismatch score: '))
+                gap[0] = int(raw_input('Gap start score: '))
+                gap[1] = int(raw_input('Gap extension score: '))
                 s_matrix = {
                     'A': {'A': match, 'G': mismatch, 'C': mismatch, 'T': mismatch},
                     'G': {'A': mismatch, 'G': match, 'C': mismatch, 'T': mismatch},
@@ -98,13 +83,15 @@ def main():
             print('Working with default')
     else:
         print('Aligning proteins. Using BLOSUM62 matrix')
-        gap = int(raw_input('Gap score: '))
+        gap = [0, 0]
+        gap[0] = int(raw_input('Gap start score: '))
+        gap[1] = int(raw_input('Gap extension score: '))
         f = open(r"blosum62.txt")
         raw_matrix = [line.split() for line in f]
         f.close()
         raw_dicts = [0 for x in range(len(raw_matrix[0]))]
         for i in range(len(raw_matrix[0])):
-            raw_dicts[i] = dict(zip(raw_matrix[0], map(int, raw_matrix[i+1])))
+            raw_dicts[i] = dict(zip(raw_matrix[0], map(int, raw_matrix[i + 1])))
 
         s_matrix = dict()
         for i in range(len(raw_matrix[0])):
@@ -112,15 +99,19 @@ def main():
 
     flag = ask('Do you want to use global(y) or local(n) alignment?')
     if flag:
-        f_matrix = NeedlemanWunsch.matrix_filling(seq, s_matrix, gap)  # Filling F-matrix, Needleman-Wunsch algorithm.
-        print_matrix(f_matrix, seq)
-        seq[0], seq[1], max_score = NeedlemanWunsch.result_seq(f_matrix, seq, s_matrix, gap)  # Getting results.
+        seq[0], seq[1], max_score = NeedlemanWunsch.matrix_filling_NW(seq, s_matrix, gap)  # Getting results.
     else:
-        f_matrix = SmithWaterman.matrix_filling(seq, s_matrix, gap)  # Filling F-matrix, Smith-Waterman algorithm.
-        print_matrix(f_matrix, seq)
-        seq[0], seq[1], max_score = SmithWaterman.result_seq(f_matrix, seq, s_matrix, gap)  # Getting results.
+        seq[0], seq[1], max_score = SmithWaterman.matrix_filling_SW(seq, s_matrix, gap)  # Getting results.
 
-    print('\nResult sequences:\n{}\n{}\nScore {}'.format(seq[0], seq[1], max_score))
+    char = [':', '|', ' ']
+    align = ''
+    for i in range(len(seq[0])):
+        if seq[0][i] == '-' or seq[1][i] == '-':
+            align += char[2]
+            continue
+        align += char[int(seq[0][i] == seq[1][i])]
+    print('\nScore {}\nResult sequences:\n{}\n{}\n{}'.format(max_score, seq[0], align, seq[1]))
+
 
 if __name__ == '__main__':
     main()

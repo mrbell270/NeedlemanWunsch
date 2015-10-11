@@ -3,7 +3,7 @@ __author__ = 'Lenovo'
 
 from collections import namedtuple
 
-MatrixCell = namedtuple('MatrixCell', 'score up_gap_length left_gap_length')
+MatrixCell = namedtuple('MatrixCell', 'score h v')
 
 
 def print_matrix(m, seq):
@@ -23,7 +23,47 @@ def print_matrix(m, seq):
         else:
             print('{:2}'.format(seq[0][i - 1])),
         for j in range(len(m[i])):
-            print('{:4}'.format(m[i][j])),
+            print('{:4}'.format(m[i][j].score)),
+        print
+
+def print_matrix_h(m, seq):
+    """
+    Printing sequences and matrix
+    :param m: [][]int
+    :param seq: [2]string
+    :return:
+    """
+    print('{:10}'.format("")),
+    for char in seq[1]:
+        print('{:4}'.format(char)),
+    print
+    for i in range(len(m)):
+        if not i:
+            print('{:2}'.format("")),
+        else:
+            print('{:2}'.format(seq[0][i - 1])),
+        for j in range(len(m[i])):
+            print('{:4}'.format(m[i][j].h)),
+        print
+
+def print_matrix_v(m, seq):
+    """
+    Printing sequences and matrix
+    :param m: [][]int
+    :param seq: [2]string
+    :return:
+    """
+    print('{:10}'.format("")),
+    for char in seq[1]:
+        print('{:4}'.format(char)),
+    print
+    for i in range(len(m)):
+        if not i:
+            print('{:2}'.format("")),
+        else:
+            print('{:2}'.format(seq[0][i - 1])),
+        for j in range(len(m[i])):
+            print('{:4}'.format(m[i][j].v)),
         print
 
 
@@ -37,11 +77,7 @@ def gap_line(gap, length):
 def horizontal_max(f_matrix, i, j, gap):
     scores = []
     for k in range(1, j):
-<<<<<<< HEAD
         scores.append(f_matrix[i][j-k].score + gap_line(gap, k))
-=======
-        scores.append(f_matrix[i][j-k] + k * gap)
->>>>>>> github/master
     if not len(scores):
         return 0
     return max(scores)
@@ -78,28 +114,24 @@ def matrix_filling_SW(seq, s_matrix, gap):
     :return:  [2]string, int
     """
     f_matrix = []  # Crating F-matrix, init with 0s
+    neg_inf = float('-inf')
     for x in range(len(seq[0]) + 1):
-        f_matrix.append([MatrixCell(0, 0, 0) for x in range(len(seq[1]) + 1)])
+        f_matrix.append([MatrixCell(0, neg_inf, neg_inf) for x in range(len(seq[1]) + 1)])
 
-    print(f_matrix)
+    for i in range(1, len(f_matrix)):  # Filling first row and column
+        f_matrix[i][0] = MatrixCell(0, neg_inf, 0)
+    for j in range(1, len(f_matrix[0])):
+        f_matrix[0][j] = MatrixCell(0, 0, neg_inf)
+
     for i in range(1, len(f_matrix)):  # Filling all other cells
         for j in range(1, len(f_matrix[i])):
-            delta = s_matrix[seq[0][i - 1]][seq[1][j - 1]]
-            diag = f_matrix[i - 1][j - 1].score + delta
+            d = f_matrix[i - 1][j - 1].score + s_matrix[seq[0][i - 1]][seq[1][j - 1]]
+            h = max(f_matrix[i][j - 1].score + gap[0] + gap[1], f_matrix[i][j - 1].h + gap[1])
+            v = max(f_matrix[i - 1][j].score + gap[0] + gap[1], f_matrix[i - 1][j].v + gap[1])
             h_max = horizontal_max(f_matrix, i, j, gap)
             v_max = vertical_matrix(f_matrix, i, j, gap)
-            score = max(0, diag, h_max, v_max)  # Choosing max of variants
-            if score == 0 or f_matrix[i][j].score == diag:
-                u_gap = 0
-                l_gap = 0
-            elif score == h_max:
-                u_gap = 0
-                l_gap = f_matrix[i][j - 1].left_gap_length + 1
-            elif score == v_max:
-                u_gap = f_matrix[i - 1][j].up_gap_length + 1
-                l_gap = 0
-            f_matrix[i][j] = MatrixCell(score, u_gap, l_gap)
-    print_matrix(f_matrix, seq)
+            score = max(0, d, h_max, v_max, h, v)  # Choosing max of variants
+            f_matrix[i][j] = MatrixCell(score, h, v)
     return result_seq(f_matrix, seq, s_matrix, gap)
 
 
@@ -115,7 +147,7 @@ def result_seq(f_matrix, seq, s_matrix, gap):
     res1 = ""
     res2 = ""
     score, i, j = max_matrix(f_matrix)
-    while f_matrix[i][j] > 0:
+    while f_matrix[i][j].score > 0:
         if i > 0 and j > 0 and f_matrix[i][j].score == f_matrix[i - 1][j - 1].score + s_matrix[seq[0][i - 1]][seq[1][j - 1]]:
             i -= 1
             j -= 1
