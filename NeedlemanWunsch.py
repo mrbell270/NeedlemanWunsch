@@ -93,15 +93,14 @@ def matrix_filling_NW(seq, s_matrix, gap):
         f_matrix[0][j] = MatrixCell(gap_line(gap, j), gap_line(gap, j), neg_inf)
 
     for i in range(1, len(f_matrix)):  # Filling all other cells
+        sys.stdout.write('-')
         for j in range(1, len(f_matrix[i])):
             d = f_matrix[i - 1][j - 1].score + s_matrix[seq[0][i - 1]][seq[1][j - 1]]
-            h = max(f_matrix[i][j - 1].score + gap[0] + gap[1], f_matrix[i][j - 1].h + gap[1])
-            v = max(f_matrix[i - 1][j].score + gap[0] + gap[1], f_matrix[i - 1][j].v + gap[1])
+            h = max(f_matrix[i][j - 1].score + gap[0], f_matrix[i][j - 1].h + gap[1])
+            v = max(f_matrix[i - 1][j].score + gap[0], f_matrix[i - 1][j].v + gap[1])
             score = max(d, h, v)  # Choosing max of variants
             f_matrix[i][j] = MatrixCell(score, h, v)
-    # print_matrix(f_matrix, seq)
-    # print_matrix_h(f_matrix, seq)
-    # print_matrix_v(f_matrix, seq)
+    print('\nF-Matrix is built.')
     return result_seq(f_matrix, seq, s_matrix, gap)
 
 
@@ -119,6 +118,7 @@ def result_seq(f_matrix, seq, s_matrix, gap):
     i = len(seq[0])
     j = len(seq[1])
     while i > 0 or j > 0:
+        sys.stdout.write('-')
         if i > 0 and j > 0 and f_matrix[i][j].score == f_matrix[i - 1][j - 1].score + s_matrix[seq[0][i - 1]][seq[1][j - 1]]:
             i -= 1
             j -= 1
@@ -132,4 +132,5 @@ def result_seq(f_matrix, seq, s_matrix, gap):
             j -= 1
             res1 = "-" + res1
             res2 = seq[1][j] + res2
+    print('\nSequences are found.')
     return res1, res2, f_matrix.pop().pop().score

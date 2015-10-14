@@ -1,3 +1,4 @@
+# coding=utf-8
 __author__ = 'Lenovo'
 
 import NeedlemanWunsch
@@ -40,15 +41,12 @@ def main():
     else:
         seq_type = 'Protein'
     if seq_type == 'DNA':
-        # match = 1  # default match
-        # mismatch = -1  # default mismatch
-        # gap = [-1, 0]  # default gap
         match = 10  # default match
         mismatch = -8  # default mismatch
         gap = [-10, -1]  # default gap
 
         print('Default scores:\nMatch {}\nMismatch {}\nGap start {}\nGap extension {}\n'.format(match, mismatch, gap[0],
-                                                                                               gap[1]))
+                                                                                                gap[1]))
         flag = ask('Do you want to change it?')
         if flag:
             flag = ask('Do you want to rewrite whole matrix?')
@@ -89,7 +87,7 @@ def main():
         f = open(r"blosum62.txt")
         raw_matrix = [line.split() for line in f]
         f.close()
-        raw_dicts = [0 for x in range(len(raw_matrix[0]))]
+        raw_dicts = [dict() for x in range(len(raw_matrix[0]))]
         for i in range(len(raw_matrix[0])):
             raw_dicts[i] = dict(zip(raw_matrix[0], map(int, raw_matrix[i + 1])))
 
